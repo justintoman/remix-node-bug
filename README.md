@@ -1,36 +1,28 @@
-# Welcome to Remix + Vite!
+# Minimal reproduction of a bug in Remix + Vite + verbatimModuleSyntax
 
-📖 See the [Remix docs](https://remix.run/docs) and the [Remix Vite docs](https://remix.run/docs/en/main/future/vite) for details on supported features.
+## Changes I made after `npm create vite@latest` with the Remix template
 
-## Development
+1. In `tsconfig.json`, add `"verbatimModuleSyntax": true`
+2. In `_index.tsx` change the `import type` for the `@remix-run/node` import to be inside the braces
+   - ❌`import type { MetaFunction } from "@remix-run/node";`
+   - ✅`import { type MetaFunction } from "@remix-run/node";`
 
-Run the Vite dev server:
+# Steps to reproduce
 
-```shellscript
-npm run dev
+1. `npm install`
+2. `npm run dev`
+3. Go to http://localhost:5173/
+4. Open the browser console and see:
+
 ```
-
-## Deployment
-
-First, build your app for production:
-
-```sh
-npm run build
+@remix-run_node.js?v=e931bf82:1543 Uncaught ReferenceError: process is not defined
+    at node_modules/util/util.js (@remix-run_node.js?v=e931bf82:1543:5)
+    at __require (chunk-WXXH56N5.js?v=4a3845ee:12:50)
+    at node_modules/stream-slice/index.js (@remix-run_node.js?v=e931bf82:7121:16)
+    at __require (chunk-WXXH56N5.js?v=4a3845ee:12:50)
+    at node_modules/@remix-run/node/dist/upload/fileUploadHandler.js (@remix-run_node.js?v=e931bf82:7318:23)
+    at __require (chunk-WXXH56N5.js?v=4a3845ee:12:50)
+    at node_modules/@remix-run/node/dist/index.js (@remix-run_node.js?v=e931bf82:7506:29)
+    at __require (chunk-WXXH56N5.js?v=4a3845ee:12:50)
+    at @remix-run_node.js?v=e931bf82:7608:16
 ```
-
-Then run the app in production mode:
-
-```sh
-npm start
-```
-
-Now you'll need to pick a host to deploy it to.
-
-### DIY
-
-If you're familiar with deploying Node applications, the built-in Remix app server is production-ready.
-
-Make sure to deploy the output of `npm run build`
-
-- `build/server`
-- `build/client`
